@@ -1,11 +1,7 @@
 # XYZ Bank – Selenium WebDriver Test Automation (Java)
 
-[![UI tests](https://github.com/u-kevine/Bank-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/u-kevine/Bank-automation/actions/workflows/ci.yml)
-
 Automated UI tests for the [XYZ Bank app](https://www.globalsqa.com/angularJs-protractor/BankingProject/),
 covering User Story 1 (Bank Manager) and User Story 2 (Customer).
-
-**Latest test report:** https://u-kevine.github.io/Bank-automation/
 
 **Stack:** Java 17 · Maven · TestNG · Selenium 4 · Page Object Model · Allure · Docker · GitHub Actions
 

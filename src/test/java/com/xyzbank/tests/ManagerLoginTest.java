@@ -17,14 +17,14 @@ public class ManagerLoginTest extends BaseTest {
     @Test(groups = {"smoke", "manager", "regression"}, description = "Bank Manager can log in")
     @Severity(SeverityLevel.BLOCKER)
     public void managerLogin() {
-        assertTrue(home.loginAsManager().tabsVisible(), "Manager tabs are not all visible");
+        assertTrue(home().loginAsManager().tabsVisible(), "Manager tabs are not all visible");
     }
 
     @Test(groups = {"manager", "regression"}, description = "Home button returns to the start screen")
     @Severity(SeverityLevel.MINOR)
     public void homeButtonReturnsToStart() {
-        home.loginAsManager();
-        home.goHome();
-        assertTrue(home.isAtStart(), "Start screen not shown");
+        home().loginAsManager();
+        home().goHome();
+        assertTrue(home().isAtStart(), "Start screen not shown");
     }
 }

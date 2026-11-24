@@ -40,7 +40,7 @@ public class ManagerAccountsTest extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     public void openAccountForNewCustomer(String currency) {
         Customer customer = newCustomer();
-        ManagerPage manager = home.loginAsManager();
+        ManagerPage manager = home().loginAsManager();
 
         String alert = manager.openOpenAccount().openAccount(customer.fullName(), currency);
 
@@ -50,7 +50,7 @@ public class ManagerAccountsTest extends BaseTest {
         assertTrue(row.isPresent() && row.get().accounts().contains(accountNo),
                 "Account " + accountNo + " not listed for the customer");
 
-        AccountPage account = home.goHome().goToCustomerLogin().login(customer.fullName());
+        AccountPage account = home().goHome().goToCustomerLogin().login(customer.fullName());
         assertEquals(account.accountNumber(), accountNo);
         assertEquals(account.balance(), 0);
         assertEquals(account.currency(), currency);
@@ -62,7 +62,7 @@ public class ManagerAccountsTest extends BaseTest {
     public void newCustomerAvailableForAccount() {
         Customer customer = newCustomer();
 
-        List<String> options = home.loginAsManager().openOpenAccount().customerOptions();
+        List<String> options = home().loginAsManager().openOpenAccount().customerOptions();
 
         assertTrue(options.contains(customer.fullName()), "New customer is not in the Open Account list");
     }
@@ -73,7 +73,7 @@ public class ManagerAccountsTest extends BaseTest {
     public void noAccessWithoutAccount() {
         Customer customer = newCustomer();
 
-        AccountPage account = home.goToCustomerLogin().login(customer.fullName());
+        AccountPage account = home().goToCustomerLogin().login(customer.fullName());
 
         assertTrue(account.hasNoAccountMessage(), "'No account' message is not shown");
         assertEquals(account.noAccountMessage(), TestData.message("no_account"));
@@ -86,7 +86,7 @@ public class ManagerAccountsTest extends BaseTest {
     public void searchCustomer() {
         String first = existingCustomer().get("first_name").asText();
         String last = existingCustomer().get("last_name").asText();
-        CustomersPage customers = home.loginAsManager().openCustomers().search(first);
+        CustomersPage customers = home().loginAsManager().openCustomers().search(first);
 
         List<CustomerRow> rows = customers.rows();
 
@@ -106,7 +106,7 @@ public class ManagerAccountsTest extends BaseTest {
     public void deleteExistingCustomer() {
         String first = existingCustomer().get("first_name").asText();
         String last = existingCustomer().get("last_name").asText();
-        CustomersPage customers = home.loginAsManager().openCustomers();
+        CustomersPage customers = home().loginAsManager().openCustomers();
 
         boolean deleted = customers.deleteCustomer(first, last);
 
@@ -119,7 +119,7 @@ public class ManagerAccountsTest extends BaseTest {
     @Severity(SeverityLevel.NORMAL)
     public void deleteNewCustomerWithAccount() {
         Customer customer = newCustomer();
-        ManagerPage manager = home.loginAsManager();
+        ManagerPage manager = home().loginAsManager();
         manager.openOpenAccount().openAccount(customer.fullName(), "Dollar");
         CustomersPage customers = manager.openCustomers();
 
@@ -134,9 +134,9 @@ public class ManagerAccountsTest extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     public void deletedCustomerCannotLogIn() {
         Customer customer = customerWithAccount();
-        home.loginAsManager().openCustomers().deleteCustomer(customer.firstName(), customer.lastName());
+        home().loginAsManager().openCustomers().deleteCustomer(customer.firstName(), customer.lastName());
 
-        List<String> loginNames = home.goHome().goToCustomerLogin().customerNames();
+        List<String> loginNames = home().goHome().goToCustomerLogin().customerNames();
 
         assertFalse(loginNames.contains(customer.fullName()),
                 "Deleted customer " + customer.fullName() + " can still log in");

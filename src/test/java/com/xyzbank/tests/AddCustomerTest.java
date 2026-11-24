@@ -51,7 +51,7 @@ public class AddCustomerTest extends BaseTest {
         JsonNode base = TestData.get("valid_customer");
         Customer customer = DataGenerator.uniqueCustomer(base.get("first_name").asText(),
                 base.get("last_name").asText(), base.get("post_code").asText());
-        AddCustomerPage addPage = home.loginAsManager().openAddCustomer();
+        AddCustomerPage addPage = home().loginAsManager().openAddCustomer();
 
         String alert = addPage.addCustomer(customer.firstName(), customer.lastName(), customer.postCode());
 
@@ -66,7 +66,7 @@ public class AddCustomerTest extends BaseTest {
     @Issue("DEF-01")
     @Severity(SeverityLevel.CRITICAL)
     public void rejectNonAlphabeticNames(String id, String firstName, String lastName) {
-        AddCustomerPage addPage = home.loginAsManager().openAddCustomer();
+        AddCustomerPage addPage = home().loginAsManager().openAddCustomer();
 
         String alert = addPage.addCustomer(firstName, lastName, "10001");
 
@@ -80,7 +80,7 @@ public class AddCustomerTest extends BaseTest {
     @Severity(SeverityLevel.CRITICAL)
     public void rejectNonNumericPostCode(String postCode) {
         Customer customer = DataGenerator.uniqueCustomer(postCode);
-        AddCustomerPage addPage = home.loginAsManager().openAddCustomer();
+        AddCustomerPage addPage = home().loginAsManager().openAddCustomer();
 
         String alert = addPage.addCustomer(customer.firstName(), customer.lastName(), postCode);
 
@@ -91,7 +91,7 @@ public class AddCustomerTest extends BaseTest {
     @Test(groups = {"manager", "regression"}, description = "Required fields are enforced")
     @Severity(SeverityLevel.NORMAL)
     public void requiredFirstName() {
-        AddCustomerPage addPage = home.loginAsManager().openAddCustomer();
+        AddCustomerPage addPage = home().loginAsManager().openAddCustomer();
 
         String alert = addPage.addCustomer("", "Lovelace", "10001");
 
@@ -105,7 +105,7 @@ public class AddCustomerTest extends BaseTest {
     @Severity(SeverityLevel.NORMAL)
     public void duplicateCustomerRejected() {
         Customer customer = DataGenerator.uniqueCustomer();
-        AddCustomerPage addPage = home.loginAsManager().openAddCustomer();
+        AddCustomerPage addPage = home().loginAsManager().openAddCustomer();
         addPage.addCustomer(customer.firstName(), customer.lastName(), customer.postCode());
 
         String secondAlert = addPage.addCustomer(customer.firstName(), customer.lastName(), customer.postCode());

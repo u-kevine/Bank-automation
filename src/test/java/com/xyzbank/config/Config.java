@@ -6,7 +6,7 @@ public final class Config {
     public static final String BROWSER = env("BROWSER", "chrome").toLowerCase();
     public static final boolean HEADLESS = Boolean.parseBoolean(env("HEADLESS", "true"));
     public static final String SELENIUM_REMOTE_URL = env("SELENIUM_REMOTE_URL", "");
-    public static final int TIMEOUT = Integer.parseInt(env("TIMEOUT", "10"));
+    public static final int TIMEOUT = Integer.parseInt(env("TIMEOUT", "15"));
 
     private Config() {
     }

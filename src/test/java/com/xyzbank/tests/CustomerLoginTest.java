@@ -25,7 +25,7 @@ public class CustomerLoginTest extends BaseTest {
         JsonNode c = TestData.get("existing_customers").get(0);
         String name = c.get("first_name").asText() + " " + c.get("last_name").asText();
 
-        AccountPage account = home.goToCustomerLogin().login(name);
+        AccountPage account = home().goToCustomerLogin().login(name);
 
         assertEquals(account.welcomeName(), name);
         assertTrue(account.accountNumber().matches("\\d+"), "Account number is not shown");

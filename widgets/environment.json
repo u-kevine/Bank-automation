@@ -1,0 +1,1 @@
+[{"values":["XYZ Bank - Full"],"name":"Suite"},{"values":["17.0.15"],"name":"Java"},{"values":["chrome (headless)"],"name":"Browser"},{"values":["Grid=http://selenium:4444"],"name":"Selenium"},{"values":["URL=https://www.globalsqa.com/angularJs-protractor/BankingProject/#/login"],"name":"Base"}]

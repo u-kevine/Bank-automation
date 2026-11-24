@@ -16,7 +16,6 @@ services:
     depends_on:
       selenium:
         condition: service_healthy
-    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     environment:
       SELENIUM_REMOTE_URL: http://selenium:4444
       BROWSER: chrome

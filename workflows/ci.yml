@@ -31,12 +31,19 @@ jobs:
       - name: Run tests in Docker
         run: |
           mkdir -p allure-results
-          HOST_UID=$(id -u) HOST_GID=$(id -g) \
-            docker compose up --abort-on-container-exit --exit-code-from tests
+          docker compose up --abort-on-container-exit --exit-code-from tests
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200
 
       - name: Stop containers
         if: always()
         run: docker compose down
+
+      - name: Take ownership of test results
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" allure-results
 
       - name: Load report history from gh-pages
         if: always()
@@ -104,11 +111,11 @@ jobs:
           shopt -s nullglob
           files=(allure-results/*-result.json)
           if [ ${#files[@]} -eq 0 ]; then echo "No test results found"; exit 1; fi
-          unexpected=$(jq -s '[.[] | select((.status == "failed" or .status == "broken") and (((.statusDetails.message // "") | test("^Known defect DEF-")) | not))] | length' "${files[@]}")
-          known=$(jq -s '[.[] | select(.status == "failed" and ((.statusDetails.message // "") | test("^Known defect DEF-")))] | length' "${files[@]}")
-          echo "Known defects: $known"
+          known='[.links[]? | select(.type == "issue" and (.name | test("^DEF-")))] | length > 0'
+          echo "Known defects: $(jq -s "[.[] | select(.status == \"failed\" and ($known))] | length" "${files[@]}")"
+          unexpected=$(jq -s "[.[] | select((.status == \"failed\" or .status == \"broken\") and (($known) | not))] | length" "${files[@]}")
           echo "Unexpected failures: $unexpected"
           if [ "$unexpected" -gt 0 ]; then
-            jq -r 'select((.status == "failed" or .status == "broken") and (((.statusDetails.message // "") | test("^Known defect DEF-")) | not)) | "- \(.name): \(.statusDetails.message // "no message")"' "${files[@]}"
+            jq -r "select((.status == \"failed\" or .status == \"broken\") and (($known) | not)) | \"- \(.name): \(.statusDetails.message // \"no message\")\"" "${files[@]}"
             exit 1
           fi

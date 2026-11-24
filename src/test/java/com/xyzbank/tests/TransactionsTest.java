@@ -15,7 +15,6 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import java.util.List;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 @Epic("XYZ Bank")
@@ -89,7 +88,7 @@ public class TransactionsTest extends BaseTest {
     @Issue("DEF-04")
     @Severity(SeverityLevel.NORMAL)
     public void historyShownRightAfterTransaction() {
-        throw new SkipException("Known defect DEF-04 (see DEFECTS.md): the history is empty when it is opened in the "
+        throw new AssertionError("Known defect DEF-04 (see DEFECTS.md): the history is empty when it is opened in the "
                 + "same second as the last transaction. This depends on split-second timing, so a reliable automated "
                 + "check is not possible; it was confirmed with instrumented runs (evidence in DEFECTS.md).");
     }

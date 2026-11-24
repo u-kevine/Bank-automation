@@ -22,11 +22,11 @@ public class AllureSetupListener implements ISuiteListener {
             Files.createDirectories(RESULTS);
             emptyFolder(RESULTS);
             String env = String.join("\n",
-                    "Base.URL=" + Config.BASE_URL,
-                    "Browser=" + Config.BROWSER,
-                    "Headless=" + Config.HEADLESS,
-                    "Remote.Grid=" + (Config.SELENIUM_REMOTE_URL.isEmpty() ? "local" : Config.SELENIUM_REMOTE_URL),
-                    "Java=" + System.getProperty("java.version"));
+                    "Suite=XYZ Bank - Full",
+                    "Java=" + System.getProperty("java.version"),
+                    "Browser=" + Config.BROWSER + (Config.HEADLESS ? " (headless)" : ""),
+                    "Selenium Grid=" + (Config.SELENIUM_REMOTE_URL.isEmpty() ? "local browser" : Config.SELENIUM_REMOTE_URL),
+                    "Base URL=" + Config.BASE_URL);
             Files.writeString(RESULTS.resolve("environment.properties"), env, StandardCharsets.UTF_8);
             try (InputStream in = getClass().getClassLoader().getResourceAsStream("categories.json")) {
                 if (in != null) {

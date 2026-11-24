@@ -1,6 +1,6 @@
 [
-  {"name": "Known defects (logged)", "matchedStatuses": ["skipped"], "messageRegex": ".*Known defect DEF-\\d+.*"},
+  {"name": "Known product defects", "matchedStatuses": ["failed"], "messageRegex": ".*Known defect DEF-\\d+.*"},
   {"name": "Defects that appear fixed (retest)", "matchedStatuses": ["failed"], "messageRegex": ".*DEF-\\d+ appears to be fixed.*"},
-  {"name": "Product defects (new failures)", "matchedStatuses": ["failed"]},
+  {"name": "Unexpected failures", "matchedStatuses": ["failed"]},
   {"name": "Test or environment problems", "matchedStatuses": ["broken"]}
 ]

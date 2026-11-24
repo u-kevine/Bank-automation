@@ -72,11 +72,11 @@ jobs:
           if [ -f "$S" ]; then
             {
               echo "## UI test results"
-              echo "| Passed | Failed | Broken | Known defects (skipped) | Total |"
+              echo "| Passed | Failed (incl. known defects) | Broken | Skipped | Total |"
               echo "|---|---|---|---|---|"
               jq -r '.statistic | "| \(.passed) | \(.failed) | \(.broken) | \(.skipped) | \(.total) |"' "$S"
               echo
-              echo "Skipped = known defects (DEF-01 to DEF-04); see DEFECTS.md and the Categories tab of the report."
+              echo "Known defects (DEF-01 to DEF-04) are counted as failed; see DEFECTS.md and the Categories tab of the report."
               echo
               echo "Full report: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
             } >> "$GITHUB_STEP_SUMMARY"
@@ -97,3 +97,18 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: allure-report
+
+      - name: Fail on unexpected failures
+        if: always()
+        run: |
+          shopt -s nullglob
+          files=(allure-results/*-result.json)
+          if [ ${#files[@]} -eq 0 ]; then echo "No test results found"; exit 1; fi
+          unexpected=$(jq -s '[.[] | select((.status == "failed" or .status == "broken") and (((.statusDetails.message // "") | test("^Known defect DEF-")) | not))] | length' "${files[@]}")
+          known=$(jq -s '[.[] | select(.status == "failed" and ((.statusDetails.message // "") | test("^Known defect DEF-")))] | length' "${files[@]}")
+          echo "Known defects: $known"
+          echo "Unexpected failures: $unexpected"
+          if [ "$unexpected" -gt 0 ]; then
+            jq -r 'select((.status == "failed" or .status == "broken") and (((.statusDetails.message // "") | test("^Known defect DEF-")) | not)) | "- \(.name): \(.statusDetails.message // "no message")"' "${files[@]}"
+            exit 1
+          fi

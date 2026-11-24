@@ -2,6 +2,7 @@ package com.xyzbank.base;
 
 import com.xyzbank.data.Customer;
 import com.xyzbank.data.DataGenerator;
+import com.xyzbank.data.TestData;
 import com.xyzbank.driver.DriverFactory;
 import com.xyzbank.listeners.AllureSetupListener;
 import com.xyzbank.listeners.KnownDefectListener;
@@ -12,6 +13,10 @@ import io.qameta.allure.Allure;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
 import java.io.ByteArrayInputStream;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
@@ -27,6 +32,11 @@ public abstract class BaseTest {
 
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
     private static final ThreadLocal<HomePage> HOME = new ThreadLocal<>();
+    private static final Queue<WebDriver> ALL_DRIVERS = new ConcurrentLinkedQueue<>();
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> ALL_DRIVERS.forEach(BaseTest::quietQuit)));
+    }
 
     protected WebDriver driver() {
         return DRIVER.get();
@@ -38,9 +48,59 @@ public abstract class BaseTest {
 
     @BeforeMethod(alwaysRun = true)
     public void openApp() {
-        WebDriver driver = DriverFactory.create();
-        DRIVER.set(driver);
+        WebDriver driver = DRIVER.get();
+        if (driver == null || !resetState(driver)) {
+            if (driver != null) {
+                discard(driver);
+            }
+            driver = DriverFactory.create();
+            DRIVER.set(driver);
+            ALL_DRIVERS.add(driver);
+        }
         HOME.set(openHome(driver));
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void afterTest(ITestResult result) {
+        WebDriver driver = DRIVER.get();
+        if (driver == null) {
+            return;
+        }
+        if (!result.isSuccess() || isKnownDefect(result)) {
+            attachScreenshot(driver);
+        }
+        HOME.remove();
+    }
+
+    private boolean resetState(WebDriver driver) {
+        try {
+            try {
+                driver.switchTo().alert().dismiss();
+            } catch (NoAlertPresentException noAlert) {
+                driver.getTitle();
+            }
+            driver.manage().deleteAllCookies();
+            ((JavascriptExecutor) driver).executeScript(
+                    "try { window.localStorage.clear(); window.sessionStorage.clear(); } catch (e) {}");
+            driver.get("about:blank");
+            return true;
+        } catch (WebDriverException browserGone) {
+            return false;
+        }
+    }
+
+    private void discard(WebDriver driver) {
+        ALL_DRIVERS.remove(driver);
+        quietQuit(driver);
+        DRIVER.remove();
+    }
+
+    private static void quietQuit(WebDriver driver) {
+        try {
+            driver.quit();
+        } catch (WebDriverException alreadyClosed) {
+            return;
+        }
     }
 
     private HomePage openHome(WebDriver driver) {
@@ -48,23 +108,6 @@ public abstract class BaseTest {
             return new HomePage(driver).open();
         } catch (TimeoutException firstAttempt) {
             return new HomePage(driver).open();
-        }
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void closeBrowser(ITestResult result) {
-        WebDriver driver = DRIVER.get();
-        if (driver == null) {
-            return;
-        }
-        try {
-            if (!result.isSuccess() || isKnownDefect(result)) {
-                attachScreenshot(driver);
-            }
-        } finally {
-            driver.quit();
-            DRIVER.remove();
-            HOME.remove();
         }
     }
 
@@ -89,6 +132,13 @@ public abstract class BaseTest {
     protected AccountPage loginAsNewAccountHolder() {
         Customer customer = customerWithAccount();
         return home().goToCustomerLogin().login(customer.fullName());
+    }
+
+    @Step("Precondition: log in as an existing demo customer")
+    protected AccountPage loginAsExistingCustomer() {
+        var c = TestData.get("existing_customers").get(1);
+        String name = c.get("first_name").asText() + " " + c.get("last_name").asText();
+        return home().goToCustomerLogin().login(name);
     }
 
     private boolean isKnownDefect(ITestResult result) {

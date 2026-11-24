@@ -35,7 +35,7 @@ public class CustomerLoginTest extends BaseTest {
     @Test(groups = {"customer", "regression"}, description = "Logout returns to customer selection")
     @Severity(SeverityLevel.NORMAL)
     public void logout() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
 
         assertFalse(account.logout().customerNames().isEmpty(), "Customer selection is not shown after logout");
     }

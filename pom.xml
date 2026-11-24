@@ -17,7 +17,7 @@
         <allure.version>2.29.0</allure.version>
         <aspectj.version>1.9.22</aspectj.version>
         <jackson.version>2.17.2</jackson.version>
-        <threads>2</threads>
+        <threads>1</threads>
     </properties>
 
     <dependencies>
@@ -69,7 +69,7 @@
                 <version>3.2.5</version>
                 <configuration>
                     <testFailureIgnore>true</testFailureIgnore>
-                    <parallel>methods</parallel>
+                    <parallel>classes</parallel>
                     <threadCount>${threads}</threadCount>
                     <properties>
                         <property>

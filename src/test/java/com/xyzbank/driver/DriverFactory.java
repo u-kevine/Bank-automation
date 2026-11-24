@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -42,6 +43,7 @@ public final class DriverFactory {
 
     private static ChromeOptions chromeOptions() {
         ChromeOptions options = new ChromeOptions();
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
         if (Config.HEADLESS) {
             options.addArguments("--headless=new");
         }
@@ -51,6 +53,7 @@ public final class DriverFactory {
 
     private static FirefoxOptions firefoxOptions() {
         FirefoxOptions options = new FirefoxOptions();
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
         if (Config.HEADLESS) {
             options.addArguments("-headless");
         }

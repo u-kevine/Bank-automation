@@ -28,7 +28,7 @@ public class TransactionsTest extends BaseTest {
     @Test(groups = {"customer", "regression"}, description = "A deposit appears in the transaction history")
     @Severity(SeverityLevel.CRITICAL)
     public void depositListed() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         account.deposit(250);
         account.waitForNewSecond();
 
@@ -40,7 +40,7 @@ public class TransactionsTest extends BaseTest {
     @Test(groups = {"customer", "regression"}, description = "A withdrawal appears in the transaction history")
     @Severity(SeverityLevel.CRITICAL)
     public void withdrawalListed() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         account.deposit(250);
         account.waitForNewSecond();
         account.withdraw(50);
@@ -57,12 +57,13 @@ public class TransactionsTest extends BaseTest {
     @Issue("DEF-03")
     @Severity(SeverityLevel.BLOCKER)
     public void historyCannotBeReset() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
+        int before = account.balance();
         account.deposit(250);
         account.waitForNewSecond();
         TransactionsPage page = account.openTransactions();
-        List<Transaction> before = page.waitForTransactions(1);
-        if (before.isEmpty()) {
+        List<Transaction> history = page.waitForTransactions(1);
+        if (history.isEmpty()) {
             throw new IllegalStateException("Precondition failed: deposit not listed before Reset");
         }
 
@@ -70,14 +71,14 @@ public class TransactionsTest extends BaseTest {
             page.reset();
         }
 
-        assertEquals(page.transactions(), before, "Transaction history changed after Reset");
-        assertEquals(page.back().balance(), 250, "Balance changed after Reset");
+        assertEquals(page.transactions(), history, "Transaction history changed after Reset");
+        assertEquals(page.back().balance(), before + 250, "Balance changed after Reset");
     }
 
     @Test(groups = {"customer", "regression"}, description = "Back returns to the account page")
     @Severity(SeverityLevel.MINOR)
     public void backToAccount() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
 
         assertFalse(account.openTransactions().back().welcomeName().isEmpty(),
                 "Back did not return to the account page");

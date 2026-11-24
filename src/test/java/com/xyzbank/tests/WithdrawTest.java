@@ -30,22 +30,24 @@ public class WithdrawTest extends BaseTest {
     @Test(groups = {"smoke", "customer", "regression"}, description = "Withdraw within the balance and the balance updates")
     @Severity(SeverityLevel.CRITICAL)
     public void withdrawWithinBalance() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
+        int before = account.balance();
         account.deposit(OPENING);
 
         account.withdraw(VALID);
 
         assertEquals(account.message(), SUCCESS);
-        assertEquals(account.balance(), OPENING - VALID);
+        assertEquals(account.balance(), before + OPENING - VALID);
     }
 
     @Test(groups = {"customer", "regression"}, description = "Withdraw the exact balance")
     @Severity(SeverityLevel.NORMAL)
     public void withdrawExactBalance() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         account.deposit(300);
+        int fullBalance = account.balance();
 
-        account.withdraw(300);
+        account.withdraw(fullBalance);
 
         assertEquals(account.message(), SUCCESS);
         assertEquals(account.balance(), 0);
@@ -54,24 +56,26 @@ public class WithdrawTest extends BaseTest {
     @Test(groups = {"customer", "regression"}, description = "Withdrawal above the balance is rejected")
     @Severity(SeverityLevel.CRITICAL)
     public void withdrawMoreThanBalance() {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         account.deposit(100);
+        int balance = account.balance();
 
-        account.withdraw(101);
+        account.withdraw(balance + 1);
 
         assertEquals(account.message(), TestData.message("withdraw_insufficient"));
-        assertEquals(account.balance(), 100, "Balance changed after a rejected withdrawal");
+        assertEquals(account.balance(), balance, "Balance changed after a rejected withdrawal");
     }
 
     @Test(groups = {"customer", "regression"}, dataProvider = "invalidAmounts", description = "Zero or negative withdrawal is rejected")
     @Severity(SeverityLevel.CRITICAL)
     public void withdrawInvalidAmount(int amount) {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         account.deposit(100);
+        int balance = account.balance();
 
         account.withdraw(amount);
 
         assertNotEquals(account.message(), SUCCESS, "Withdrawal of " + amount + " reported success");
-        assertEquals(account.balance(), 100, "Balance changed after withdrawing " + amount);
+        assertEquals(account.balance(), balance, "Balance changed after withdrawing " + amount);
     }
 }

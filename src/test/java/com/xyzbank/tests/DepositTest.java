@@ -34,7 +34,7 @@ public class DepositTest extends BaseTest {
             description = "Deposit a valid amount and the balance updates")
     @Severity(SeverityLevel.CRITICAL)
     public void depositValidAmount(int amount) {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         int before = account.balance();
 
         account.deposit(amount);
@@ -46,7 +46,7 @@ public class DepositTest extends BaseTest {
     @Test(groups = {"customer", "regression"}, dataProvider = "invalidAmounts", description = "Zero or negative deposit is rejected")
     @Severity(SeverityLevel.CRITICAL)
     public void depositInvalidAmount(int amount) {
-        AccountPage account = loginAsNewAccountHolder();
+        AccountPage account = loginAsExistingCustomer();
         int before = account.balance();
 
         account.deposit(amount);

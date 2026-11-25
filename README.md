@@ -5,7 +5,6 @@ covering User Story 1 (Bank Manager) and User Story 2 (Customer).
 
 **Stack:** Java 17 · Maven · TestNG 7.10 · Selenium 4.27 · Page Object Model · Jackson (JSON test data) · Allure 2 · Docker · GitHub Actions
 
-**Defect log:** [DEFECTS.md](DEFECTS.md)
 
 ---
 

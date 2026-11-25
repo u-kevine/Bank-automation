@@ -1,6 +1,21 @@
 [
-  {"name": "Known product defects", "matchedStatuses": ["failed"], "messageRegex": ".*Known defect DEF-\\d+.*"},
-  {"name": "Defects that appear fixed (retest)", "matchedStatuses": ["failed"], "messageRegex": ".*DEF-\\d+ appears to be fixed.*"},
-  {"name": "Unexpected failures", "matchedStatuses": ["failed"]},
-  {"name": "Test or environment problems", "matchedStatuses": ["broken"]}
+  {
+    "name": "Known product defects",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*Known defect DEF-\\d+.*"
+  },
+  {
+    "name": "Defects that appear fixed (retest)",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*DEF-\\d+ appears to be fixed.*"
+  },
+  {
+    "name": "Unexpected failures",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s)^(?!Known defect DEF-|DEF-\\d+ appears to be fixed).*"
+  },
+  {
+    "name": "Test or environment problems",
+    "matchedStatuses": ["broken"]
+  }
 ]
